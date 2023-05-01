@@ -42,8 +42,21 @@ class SQL:
             query = self._read_sql(file_name)[0]
             return conn.sql(query).pl()
 
+    def exists(self, table_name: str):
+        conn = duckdb.connect(str(self._database))
+
+        try:
+            output = conn.sql(f"""SELECT * FROM {table_name} LIMIT 5;""").fetchone()
+            return True
+        except duckdb.CatalogException:
+            return False
+
 
 if __name__ == "__main__":
     output = SQL().obtain(file_name="bland_query.sql")
+
+    print(output)
+
+    output = SQL().exists("boomba_ja")
 
     print(output)

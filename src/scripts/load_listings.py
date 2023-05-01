@@ -1,37 +1,33 @@
 import os
 from pathlib import Path
+import duckdb
+import json
 
 current_file = Path(__file__).resolve()
 project_root = current_file.parents[2]
 
-import sys
+# Load listing jsons in /data
+data_root = project_root / "data"
 
-sys.path.append(str(project_root))
+listing_paths = [
+    str(data_root / file)
+    for file in os.listdir(data_root)
+    if file.startswith("listings_")
+]
 
-import requests
-from bs4 import BeautifulSoup
-import json
-import re
-from datetime import datetime
+listing_data = []
+listing_ids = set()
+for listing_path in listing_paths:
+    with open(listing_path, "r") as listing_dict:
+        listing_dict = json.load(listing_dict)
+        [
+            (listing_data.append(listing), listing_ids.add(listing["id"]))
+            for listing in listing_dict
+            if listing["id"] not in listing_ids
+        ]
 
-from src.functions.get_set_info import extract_storage_info, parse_storage
+# Load existing listing table
 
-# Define the URL
-URL = "https://www.immoweb.be/en/search/house/for-sale?countries=BE&page=1&orderBy=relevance"
+# Find listings not yet in table and insert
 
-# Send a request to fetch the webpage
-response = requests.get(URL)
-
-# Check if the request was successful (status code 200)
-if response.status_code == 200:
-    # Parse the HTML content
-    soup = BeautifulSoup(response.content, "html.parser")
-
-    json_listings = parse_storage(soup)
-
-    timestamp = datetime.now().strftime("%Y%m%d_%H:%M:%S")
-    with open(project_root / f"data/listings_{timestamp}.json", "w") as json_file:
-        json.dump(json_listings, json_file)
-
-    ## Example of storage info extraction (for deeper query)
-    storage_info = extract_storage_info(json_listings[0])
+# Clean up and export to a clean listing table
