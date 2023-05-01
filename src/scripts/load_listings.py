@@ -33,4 +33,5 @@ if response.status_code == 200:
     with open(project_root / f"data/listings_{timestamp}.json", "w") as json_file:
         json.dump(json_listings, json_file)
 
+    ## Example of storage info extraction (for deeper query)
     storage_info = extract_storage_info(json_listings[0])
