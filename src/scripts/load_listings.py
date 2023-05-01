@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 current_file = Path(__file__).resolve()
-project_root = current_file.parents[1]
+project_root = current_file.parents[2]
 
 import sys
 
@@ -12,13 +12,9 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import re
+from datetime import datetime
 
-from src.functions.get_set_info import (
-    get_immo_house_html,
-    extract_storage_info,
-    parse_storage,
-    parse_classified,
-)
+from src.functions.get_set_info import extract_storage_info, parse_storage
 
 # Define the URL
 URL = "https://www.immoweb.be/en/search/house/for-sale?countries=BE&page=1&orderBy=relevance"
@@ -32,5 +28,9 @@ if response.status_code == 200:
     soup = BeautifulSoup(response.content, "html.parser")
 
     json_listings = parse_storage(soup)
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H:%M:%S")
+    with open(project_root / f"data/listings_{timestamp}.json", "w") as json_file:
+        json.dump(json_listings, json_file)
 
     storage_info = extract_storage_info(json_listings[0])

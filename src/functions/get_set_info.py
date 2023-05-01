@@ -43,4 +43,12 @@ def parse_storage(soup: BeautifulSoup) -> list[dict]:
 
 
 def parse_classified(soup: BeautifulSoup) -> dict:
-    pass
+    re_classifiedInfo = re.compile(r"window.dataLayer = (\[ .* \]);")
+
+    soup_pretty = soup.prettify().replace("\n", "")
+    soup_pretty = re.sub(" +", " ", soup_pretty)
+
+    json_classifiedInfo = re.search(re_classifiedInfo, soup_pretty).group(1)
+    json_classifiedInfo = json.loads(json_classifiedInfo)[0]
+
+    return json_classifiedInfo
