@@ -1,0 +1,7 @@
+CREATE TABLE {0} AS 
+SELECT * 
+FROM {1};
+
+
+
+

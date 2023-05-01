@@ -2,9 +2,15 @@ import os
 from pathlib import Path
 import duckdb
 import json
+import sys
+import polars as pl
 
 current_file = Path(__file__).resolve()
 project_root = current_file.parents[2]
+
+sys.path.append(str(project_root))
+
+from src.functions.read_sql import SQL
 
 # Load listing jsons in /data
 data_root = project_root / "data"
@@ -26,7 +32,39 @@ for listing_path in listing_paths:
             if listing["id"] not in listing_ids
         ]
 
+listing_pl = pl.from_records(listing_data)
+
 # Load existing listing table
+if not SQL().exists("listings"):
+    conn = duckdb.connect(str(SQL()._database))
+    sql_create = """
+    CREATE TABLE immo_data.listings AS 
+    SELECT * 
+    FROM listing_pl
+    """
+
+    conn.execute(sql_create)
+
+    conn.commit()
+    conn.close()
+
+else:
+    conn = duckdb.connect(str(SQL()._database))
+
+    sql_insert = """
+        INSERT INTO immo_data.listings
+        SELECT *
+        FROM listing_pl
+        """
+
+    conn.execute(sql_insert)
+
+    conn.commit()
+
+    conn.close()
+
+
+print()
 
 # Find listings not yet in table and insert
 
