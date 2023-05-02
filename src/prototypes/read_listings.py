@@ -1,6 +1,7 @@
-import duckdb
-from pathlib import Path
 import os
+from pathlib import Path
+
+import duckdb
 
 current_file = Path(__file__).resolve()
 project_root = current_file.parents[2]

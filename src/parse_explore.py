@@ -8,17 +8,15 @@ import sys
 
 sys.path.append(str(project_root))
 
-import requests
-from bs4 import BeautifulSoup
 import json
 import re
 
-from src.functions.get_set_info import (
-    get_immo_house_html,
-    extract_storage_info,
-    parse_storage,
-    parse_classified,
-)
+import requests
+from bs4 import BeautifulSoup
+
+from src.functions.get_set_info import (extract_storage_info,
+                                        get_immo_house_html, parse_classified,
+                                        parse_storage)
 
 # Define the URL
 URL = "https://www.immoweb.be/en/search/house/for-sale?countries=BE&page=1&orderBy=relevance"

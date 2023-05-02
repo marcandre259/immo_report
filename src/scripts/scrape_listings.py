@@ -8,11 +8,12 @@ import sys
 
 sys.path.append(str(project_root))
 
-import requests
-from bs4 import BeautifulSoup
 import json
 import re
 from datetime import datetime
+
+import requests
+from bs4 import BeautifulSoup
 
 from src.functions.get_set_info import extract_storage_info, parse_storage
 

@@ -1,8 +1,8 @@
+import json
+import re
 from typing import Union
 
 from bs4 import BeautifulSoup
-import re
-import json
 
 BASE_HTML = "https://www.immoweb.be/en/classified/{0}/{1}/{2}/{3}/{4}"
 

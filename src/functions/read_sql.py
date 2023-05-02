@@ -1,14 +1,16 @@
-from pathlib import Path
 import os
-from typing import List, Optional
+from pathlib import Path
 from threading import Thread
+from typing import List, Optional
+
 import duckdb
 import polars as pl
 
 current_file = Path(__file__).resolve()
 project_root = current_file.parents[2]
-SQL_PATH = project_root / "src/sql"
+
 DATABASE = project_root / "data/immo_data.db"
+SQL_PATH = project_root / "src/sql"
 
 
 class SQL:
@@ -16,30 +18,36 @@ class SQL:
         self._sql_path = SQL_PATH
         self._database = DATABASE
 
-    def _read_sql(self, file_name: str) -> List[str]:
+    def _read_sql(self, file_name: str, **kwargs) -> List[str]:
         file_path = self._sql_path / file_name
-        with open(file_path, "r") as sql_queries:
-            query_list = sql_queries.read().split(";")
+        with open(file_path, "r") as sql_query:
+            query = sql_query.read().split(";")[0]
 
-        return query_list
+        query = query.format(**kwargs)
 
-    def execute(self, file_name: str) -> None:
+        return query
+
+    def execute(self, file_name: str, **kwargs) -> None:
         conn = duckdb.connect(str(self._database))
-        queries = self._read_sql(file_name)
+        query = self._read_sql(file_name, **kwargs)
 
-        for query in queries:
-            conn.execute(query)
+        conn.execute(query)
 
         conn.commit()
 
-    def obtain(self, query_name: Optional[str] = None, file_name: Optional[str] = None):
+    def obtain(
+        self,
+        query_name: Optional[str] = None,
+        file_name: Optional[str] = None,
+        **kwargs,
+    ):
         conn = duckdb.connect(str(self._database))
 
         if isinstance(query_name, str):
-            return conn.sql(query_name).pl()
+            return conn.sql(query_name, **kwargs).pl()
 
         elif isinstance(file_name, str):
-            query = self._read_sql(file_name)[0]
+            query = self._read_sql(file_name, **kwargs)
             return conn.sql(query).pl()
 
     def exists(self, table_name: str):
@@ -60,3 +68,10 @@ if __name__ == "__main__":
     output = SQL().exists("boomba_ja")
 
     print(output)
+
+    # Try out argument input capability
+    SQL()._read_sql(
+        "initialize_listings_table.sql",
+        listing_table="listings",
+        listing_input="blank_pl",
+    )
