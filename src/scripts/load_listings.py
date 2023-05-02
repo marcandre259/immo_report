@@ -39,8 +39,8 @@ if not SQL().exists("listings"):
     conn = duckdb.connect(str(SQL()._database))
     sql_create = """
     CREATE TABLE immo_data.listings AS 
-    SELECT * 
-    FROM listing_pl
+    SELECT lpl.id, lpl.property, lpl.transaction
+    FROM listing_pl lpl
     """
 
     conn.execute(sql_create)
@@ -52,9 +52,15 @@ else:
     conn = duckdb.connect(str(SQL()._database))
 
     sql_insert = """
+        WITH new_listings AS (
+            SELECT lpl.id, lpl.property, lpl.transaction
+            FROM listing_pl lpl
+            LEFT JOIN immo_data.listings lis ON lpl.id = lis.id
+            WHERE lis.id is NULL 
+        )
         INSERT INTO immo_data.listings
         SELECT *
-        FROM listing_pl
+        FROM new_listings; 
         """
 
     conn.execute(sql_insert)
@@ -65,7 +71,5 @@ else:
 
 
 print()
-
-# Find listings not yet in table and insert
 
 # Clean up and export to a clean listing table
