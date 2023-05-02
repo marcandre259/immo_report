@@ -49,3 +49,4 @@ else:
     )
 
 # Clean up and export to a clean listing table
+print()
