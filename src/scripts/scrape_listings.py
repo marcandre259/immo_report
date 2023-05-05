@@ -9,30 +9,27 @@ import sys
 sys.path.append(str(project_root))
 
 import json
+import logging
 import re
 from datetime import datetime
 
 import requests
 from bs4 import BeautifulSoup
 
-from src.functions.get_set_info import extract_storage_info, parse_storage
+from src.functions.listing_request import request_parse_listing
+from concurrent.futures import ProcessPoolExecutor
 
-# Define the URL
-URL = "https://www.immoweb.be/en/search/house/for-sale?countries=BE&page=1&orderBy=relevance"
 
-# Send a request to fetch the webpage
-response = requests.get(URL)
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
-# Check if the request was successful (status code 200)
-if response.status_code == 200:
-    # Parse the HTML content
-    soup = BeautifulSoup(response.content, "html.parser")
+status_code = 200
+page = 1
+max_page = 400
 
-    json_listings = parse_storage(soup)
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H:%M:%S")
-    with open(project_root / f"data/listings_{timestamp}.json", "w") as json_file:
-        json.dump(json_listings, json_file)
+with ProcessPoolExecutor(max_workers=16) as executor:
+    futures = [
+        executor.submit(request_parse_listing, page) for page in range(1, max_page + 1)
+    ]
 
-    ## Example of storage info extraction (for deeper query)
-    storage_info = extract_storage_info(json_listings[0])
+results = [future.result() for future in futures]

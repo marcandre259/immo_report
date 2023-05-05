@@ -14,9 +14,12 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
-from src.functions.get_set_info import (extract_storage_info,
-                                        get_immo_house_html, parse_classified,
-                                        parse_storage)
+from src.functions.get_set_info import (
+    extract_storage_info,
+    get_immo_house_html,
+    parse_classified,
+    parse_storage,
+)
 
 # Define the URL
 URL = "https://www.immoweb.be/en/search/house/for-sale?countries=BE&page=1&orderBy=relevance"
