@@ -14,7 +14,7 @@ project_root = current_file.parents[2]
 
 sys.path.append(str(project_root))
 
-from src.functions.read_sql import SQL
+from src.functions.sql import SQL
 
 # Load listing jsons in /data
 data_root = project_root / "data/listings"
