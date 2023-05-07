@@ -50,17 +50,27 @@ class SQL:
             query = self._read_sql(file_name, **kwargs)
             return conn.sql(query).pl()
 
-    def exists(self, table_name: str):
+    def exists(self, table_name: str) -> bool:
         conn = duckdb.connect(str(self._database))
 
         try:
-            output = conn.sql(f"""SELECT * FROM {table_name} LIMIT 5;""").fetchone()
+            output = conn.sql(f"SELECT * FROM {table_name} LIMIT 5;").fetchone()
             return True
-        except duckdb.CatalogException:
+        except (duckdb.CatalogException, duckdb.InvalidInputException):
             return False
+
+    def drop_table(self, table_name: str):
+        conn = duckdb.connect(str(self._database))
+
+        try:
+            output = conn.sql(f"DROP TABLE {table_name};")
+        except duckdb.CatalogException as err:
+            print(err)
 
 
 if __name__ == "__main__":
+    output = SQL().drop_table("blooomba")
+
     output = SQL().obtain(file_name="bland_query.sql")
 
     print(output)
