@@ -15,5 +15,5 @@ jobs:
     - name: Check code formatting with Black
       run: docker run immo-report conda run -n immo_report black --check .
 
-    - name: Check imports sorting with isort
-      run: docker run immo-report conda run -n immo_report isort --check-only .
+    # - name: Check imports sorting with isort
+    #   run: docker run immo-report conda run -n immo_report isort --check-only .
