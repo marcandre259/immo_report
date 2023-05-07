@@ -1,0 +1,19 @@
+name: CI/CD Pipeline
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Build Docker image
+      run: docker build -t immo-report .
+
+    - name: Check code formatting with Black
+      run: docker run immo-report conda run -n immo_report black --check .
+
+    - name: Check imports sorting with isort
+      run: docker run immo-report conda run -n immo_report isort --check-only .
