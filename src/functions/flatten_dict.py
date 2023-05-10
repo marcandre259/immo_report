@@ -1,7 +1,7 @@
 from typing import Dict, Union
 
 
-def flatten_dict(details: Dict[str, Union[str, Dict]]):
+def flatten_dict(details: Dict[str, Union[str, Dict]]) -> Dict[str, str]:
     flat_dict = {}
 
     def flatten_level(level: Dict[str, Union[str, Dict]], prefix=""):
