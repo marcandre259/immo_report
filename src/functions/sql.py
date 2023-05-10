@@ -9,14 +9,14 @@ import polars as pl
 current_file = Path(__file__).resolve()
 project_root = current_file.parents[2]
 
-DATABASE = project_root / "data/immo_data.db"
-SQL_PATH = project_root / "src/sql"
+_DATABASE = project_root / "data/immo_data.db"
+_SQL_PATH = project_root / "src/sql"
 
 
 class SQL:
     def __init__(self):
-        self._sql_path = SQL_PATH
-        self._database = DATABASE
+        self._sql_path = _SQL_PATH
+        self._database = _DATABASE
 
     def _read_sql(self, file_name: str, **kwargs) -> List[str]:
         file_path = self._sql_path / file_name

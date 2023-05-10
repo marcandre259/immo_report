@@ -17,6 +17,7 @@ from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 
+from src.functions.sql import SQL
 from src.functions.get_set_info import (
     get_immo_house_html,
     extract_storage_info,
@@ -24,7 +25,7 @@ from src.functions.get_set_info import (
 )
 
 # Build a list of "info_dict" from existing data
-
+sql
 
 # Extract storage info from these info dict
 
