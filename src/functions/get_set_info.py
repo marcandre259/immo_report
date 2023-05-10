@@ -8,6 +8,8 @@ from datetime import datetime
 
 from pathlib import Path
 
+import time
+
 BASE_HTML = "https://www.immoweb.be/en/classified/{0}/{1}/{2}/{3}/{4}"
 
 PROJECT_ROOT = Path(__file__).parents[2]
@@ -63,12 +65,25 @@ def parse_classified(soup: BeautifulSoup) -> dict:
 def request_parse_classified(storage_dict):
     html_address = get_immo_house_html(storage_dict)
 
+    time.sleep(0.01)
     response = requests.get(html_address)
 
     if response.status_code == 200:
         soup = BeautifulSoup(response.content, "html.parser")
 
         json_classified = parse_classified(soup)
+
+        # Get other info from the page (description, etc.)
+        title_tag = soup.find("meta", itemprop="name")["content"]
+        description_tag = soup.find("meta", itemprop="description")["content"]
+
+        other_dict = {}
+        if title_tag:
+            other_dict["name"] = title_tag
+        if description_tag:
+            other_dict["description"] = description_tag
+
+        json_classified["other_defined"] = other_dict
 
         hash_classified = "".join([str(value)[:10] for value in storage_dict.values()])
         hash_classified = re.sub("_", "", hash_classified)

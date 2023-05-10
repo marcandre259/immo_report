@@ -19,9 +19,8 @@ from bs4 import BeautifulSoup
 
 from src.functions.sql import SQL
 from src.functions.get_set_info import (
-    get_immo_house_html,
     extract_storage_info,
-    parse_storage,
+    request_parse_classified,
 )
 
 MAX_WORKERS = 16
@@ -38,7 +37,11 @@ with ProcessPoolExecutor(MAX_WORKERS) as executor:
 
 dicts_storage = [future.result() for future in futures]
 
-# Extract storage info from these info dict
-print()
-
 # Routine to parse storage page and save info as json (in a classified folder)
+with ProcessPoolExecutor(MAX_WORKERS) as executor:
+    futures = [
+        executor.submit(request_parse_classified, dict_storage)
+        for dict_storage in dicts_storage
+    ]
+
+empty = [future.result() for future in futures]
