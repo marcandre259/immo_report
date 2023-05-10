@@ -24,10 +24,21 @@ from src.functions.get_set_info import (
     parse_storage,
 )
 
+MAX_WORKERS = 16
+
 # Build a list of "info_dict" from existing data
-sql
+pl_listings = SQL().obtain("SELECT * FROM listings")
+dicts_listing = pl_listings.to_dicts()
+
+with ProcessPoolExecutor(MAX_WORKERS) as executor:
+    futures = [
+        executor.submit(extract_storage_info, dict_listing)
+        for dict_listing in dicts_listing
+    ]
+
+dicts_storage = [future.result() for future in futures]
 
 # Extract storage info from these info dict
-
+print()
 
 # Routine to parse storage page and save info as json (in a classified folder)

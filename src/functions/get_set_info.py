@@ -2,15 +2,21 @@ import json
 import re
 from typing import Union
 
+import requests
 from bs4 import BeautifulSoup
+from datetime import datetime
+
+from pathlib import Path
 
 BASE_HTML = "https://www.immoweb.be/en/classified/{0}/{1}/{2}/{3}/{4}"
+
+PROJECT_ROOT = Path(__file__).parents[2]
 
 
 def get_immo_house_html(storage_info: dict[Union[str, int]]) -> str:
     return BASE_HTML.format(
         storage_info.get("subtype"),
-        storage_info.get("transaction_type"),
+        storage_info.get("transaction"),
         storage_info.get("location"),
         storage_info.get("postal_code"),
         storage_info.get("id"),
@@ -52,3 +58,36 @@ def parse_classified(soup: BeautifulSoup) -> dict:
     json_classifiedInfo = json.loads(json_classifiedInfo)[0]
 
     return json_classifiedInfo
+
+
+def request_parse_classified(storage_dict):
+    html_address = get_immo_house_html(storage_dict)
+
+    response = requests.get(html_address)
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.content, "html.parser")
+
+        json_classified = parse_classified(soup)
+
+        hash_classified = "".join([str(value)[:10] for value in storage_dict.values()])
+        hash_classified = re.sub("_", "", hash_classified)
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H:%M:%S")
+        with open(
+            PROJECT_ROOT
+            / f"data/classified/classified_{hash_classified}_{timestamp}.json",
+            "w",
+        ) as json_file:
+            json.dump(json_classified, json_file)
+
+
+if __name__ == "__main__":
+    storage_dict = {
+        "id": 10536930,
+        "subtype": "house",
+        "transaction": "for_sale",
+        "postal_code": "6830",
+        "location": "Bouillon",
+    }
+    request_parse_classified(storage_dict)
