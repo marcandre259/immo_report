@@ -1,14 +1,12 @@
 import json
 import re
+import time
+from datetime import datetime
+from pathlib import Path
 from typing import Union
 
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime
-
-from pathlib import Path
-
-import time
 
 BASE_HTML = "https://www.immoweb.be/en/classified/{0}/{1}/{2}/{3}/{4}"
 
@@ -88,7 +86,7 @@ def request_parse_classified(storage_dict):
         hash_classified = "".join([str(value)[:10] for value in storage_dict.values()])
         hash_classified = re.sub("_", "", hash_classified)
 
-        timestamp = datetime.now().strftime("%Y%m%d_%H:%M:%S")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         with open(
             PROJECT_ROOT
             / f"data/classified/classified_{hash_classified}_{timestamp}.json",

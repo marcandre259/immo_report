@@ -17,11 +17,8 @@ from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 
+from src.functions.get_set_info import extract_storage_info, request_parse_classified
 from src.functions.sql import SQL
-from src.functions.get_set_info import (
-    extract_storage_info,
-    request_parse_classified,
-)
 
 MAX_WORKERS = 16
 

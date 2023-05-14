@@ -32,7 +32,7 @@ def request_parse_listing(page: int):
 
         json_listings = parse_storage(soup)
 
-        timestamp = datetime.now().strftime("%Y%m%d_%H:%M:%S")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         with open(
             project_root / f"data/listings/listings_{page}_{timestamp}.json", "w"
         ) as json_file:
