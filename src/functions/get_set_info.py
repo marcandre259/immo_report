@@ -4,7 +4,9 @@ import time
 from datetime import datetime
 from pathlib import Path
 from typing import Union
+import logging
 
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
@@ -60,6 +62,33 @@ def parse_classified(soup: BeautifulSoup) -> dict:
     return json_classifiedInfo
 
 
+def parse_classified_table(soup: BeautifulSoup) -> dict:
+    """
+    Additional function to get info from classified table (html)
+    """
+    html_tables = soup.find_all("table")
+
+    table_dict = {}
+
+    for html_table in html_tables:
+        list_variables = html_table.find_all(class_="classified-table__header")
+        list_values = html_table.find_all(class_="classified-table__data")
+
+        for i in range(len(list_variables)):
+            variable = (
+                list_variables[i]
+                .contents[0]
+                .replace("\n", "")
+                .strip()
+                .lower()
+                .replace(" ", "_")
+            )
+            value = list_values[i].contents[0].replace("\n", "").strip().lower()
+            table_dict[variable] = value
+
+    return table_dict
+
+
 def request_parse_classified(storage_dict):
     html_address = get_immo_house_html(storage_dict)
 
@@ -83,6 +112,8 @@ def request_parse_classified(storage_dict):
 
         json_classified["other_defined"] = other_dict
 
+        json_classified["classified_table"] = parse_classified_table(soup)
+
         hash_classified = "".join([str(value)[:10] for value in storage_dict.values()])
         hash_classified = re.sub("_", "", hash_classified)
 
@@ -94,13 +125,17 @@ def request_parse_classified(storage_dict):
         ) as json_file:
             json.dump(json_classified, json_file)
 
+        logging.info(
+            msg=f"Succeeding in extracting classified at address {html_address}"
+        )
+
+    else:
+        logging.info(msg=f"Failed in extracting listings at address {html_address}")
+
 
 if __name__ == "__main__":
-    storage_dict = {
-        "id": 10536930,
-        "subtype": "house",
-        "transaction": "for_sale",
-        "postal_code": "6830",
-        "location": "Bouillon",
-    }
-    request_parse_classified(storage_dict)
+    with open(PROJECT_ROOT / "data/misc/webpage_for_houses.html") as file:
+        content = file.read()
+        soup = BeautifulSoup(content, "html.parser")
+
+    parse_classified_table(soup)
