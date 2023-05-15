@@ -4,6 +4,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 from typing import Union
+import logging
 
 import pandas as pd
 import requests
@@ -123,6 +124,11 @@ def request_parse_classified(storage_dict):
             "w",
         ) as json_file:
             json.dump(json_classified, json_file)
+
+        logging.info(msg=f"Succeeding in extracting classified at address {html_address}")
+
+    else:
+        logging.info(msg=f"Failed in extracting listings at address {html_address}")
 
 
 if __name__ == "__main__":
