@@ -22,7 +22,7 @@ from src.functions.sql import SQL
 
 MAX_WORKERS = 16
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 # Build a list of "info_dict" from existing data
 pl_listings = SQL().obtain("SELECT * FROM listings")

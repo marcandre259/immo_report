@@ -92,7 +92,7 @@ def parse_classified_table(soup: BeautifulSoup) -> dict:
 def request_parse_classified(storage_dict):
     html_address = get_immo_house_html(storage_dict)
 
-    time.sleep(0.01)
+    time.sleep(1)
     response = requests.get(html_address)
 
     if response.status_code == 200:

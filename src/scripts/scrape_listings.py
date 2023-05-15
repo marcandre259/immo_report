@@ -21,7 +21,7 @@ from src.functions.listing_request import request_parse_listing
 
 MAX_WORKERS = 16
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 status_code = 200
 page = 1
