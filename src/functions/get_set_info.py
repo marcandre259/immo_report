@@ -125,7 +125,9 @@ def request_parse_classified(storage_dict):
         ) as json_file:
             json.dump(json_classified, json_file)
 
-        logging.info(msg=f"Succeeding in extracting classified at address {html_address}")
+        logging.info(
+            msg=f"Succeeding in extracting classified at address {html_address}"
+        )
 
     else:
         logging.info(msg=f"Failed in extracting listings at address {html_address}")
