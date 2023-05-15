@@ -59,6 +59,11 @@ def parse_classified(soup: BeautifulSoup) -> dict:
 
     return json_classifiedInfo
 
+def parse_classified_table(soup: BeautifulSoup) -> dict:
+    """
+    Additional function to get info from classified table (html)
+    """
+    pass 
 
 def request_parse_classified(storage_dict):
     html_address = get_immo_house_html(storage_dict)
