@@ -132,6 +132,8 @@ def request_parse_classified(storage_dict):
     else:
         logging.info(msg=f"Failed in extracting listings at address {html_address}")
 
+    return "Boop"
+
 
 if __name__ == "__main__":
     with open(PROJECT_ROOT / "data/misc/webpage_for_houses.html") as file:

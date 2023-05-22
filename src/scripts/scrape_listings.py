@@ -1,3 +1,4 @@
+import itertools
 import os
 from pathlib import Path
 
@@ -19,7 +20,7 @@ from bs4 import BeautifulSoup
 
 from src.functions.listing_request import request_parse_listing
 
-MAX_WORKERS = 16
+MAX_WORKERS = 20
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
@@ -29,7 +30,11 @@ max_page = 400
 
 with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
     futures = [
-        executor.submit(request_parse_listing, page) for page in range(1, max_page + 1)
+        executor.submit(request_parse_listing, page, tp, transaction_tp)
+        for page, tp, transaction_tp in itertools.product(
+            range(1, max_page + 1), ("house", "apartment"), ("for-sale", "for-rent")
+        )
     ]
 
+# Correct
 results = [future.result() for future in futures]

@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -16,11 +17,12 @@ import sys
 sys.path.append(str(project_root))
 
 
-def request_parse_listing(page: int):
+def request_parse_listing(page: int, type: str, transaction: str):
     # Define the URL
-    URL = f"https://www.immoweb.be/en/search/house/for-sale?countries=BE&page={page}&orderBy=relevance"
+    URL = f"https://www.immoweb.be/en/search/{type}/{transaction}?countries=BE&page={page}&orderBy=relevance"
 
     # Send a request to fetch the webpage
+    time.sleep(0.1)
     response = requests.get(URL)
 
     status_code = response.status_code
@@ -34,7 +36,9 @@ def request_parse_listing(page: int):
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         with open(
-            project_root / f"data/listings/listings_{page}_{timestamp}.json", "w"
+            project_root
+            / f"data/listings/listings_{page}_{type}_{transaction}_{timestamp}.json",
+            "w",
         ) as json_file:
             json.dump(json_listings, json_file)
 
@@ -45,3 +49,5 @@ def request_parse_listing(page: int):
 
     else:
         logging.info(msg=f"Failed in extracting listings at page {page}")
+
+    return "Boop"
