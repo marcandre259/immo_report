@@ -1,30 +1,30 @@
 # Query values from list of json files
-# Primary use is filtering relevant files. 
-from typing import Union, List
+# Primary use is filtering relevant files.
 import json
+from pathlib import Path
+from typing import List
 
-def get_json_values(file_list: List[str], path: str, *args):
+
+def get_json_values(file_list: List[str], path: Path, *args):
     value_list = []
     for file in file_list:
+        error_flag = False
         # Probably smart to parralelize that chunk
-        with open(path + file) as f:
+        with open(str(path / file)) as f:
             data_dict = json.load(f)
 
         for arg in args:
-            try: 
+            try:
                 data_dict = data_dict[arg]
-            except Exception as e:
-                print(e)
-                break 
+            except KeyError:
+                error_flag = True
+                break
 
-        value_list.append(data_dict)
+        if not error_flag:
+            value_list.append(data_dict)
 
     return value_list
-        
 
-        
-def f(*args):
-    pass
 
 if __name__ == "__main__":
-    f("a", "b")
+    pass
