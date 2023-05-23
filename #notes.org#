@@ -1,0 +1,10 @@
+* Ideas <2023-05-14 Sun>
+- Regression model for price
+- Recommendation system (... We give rating and we ask for similar
+  classifieds)
+- Agency prices vs people prices
+- Price history (increasing?)
+- When is a house sold. 
+
+* Other
+- We only need the ID to make a classified request.

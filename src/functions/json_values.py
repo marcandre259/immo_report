@@ -1,10 +1,10 @@
 # Query values from list of json files
 # Primary use is filtering relevant files.
 import json
-from pathlib import Path
-from typing import List
 from concurrent.futures import ProcessPoolExecutor
 from functools import partial
+from pathlib import Path
+from typing import List
 
 
 def select_value(filename: str, path: Path, *args):
