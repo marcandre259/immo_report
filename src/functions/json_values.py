@@ -40,24 +40,9 @@ def get_json_values_parallel(file_list: List[str], path: Path, *args, ncores: in
 
 
 def get_json_values(file_list: List[str], path: Path, *args):
-    value_list = []
-    for file in file_list:
-        error_flag = False
-        # Probably smart to parralelize that chunk
-        with open(str(path / file)) as f:
-            data_dict = json.load(f)
+    result = [select_value(filename, path, *args) for filename in file_list]
 
-        for arg in args:
-            try:
-                data_dict = data_dict[arg]
-            except KeyError:
-                error_flag = True
-                break
-
-        if not error_flag:
-            value_list.append(data_dict)
-
-    return value_list
+    return result
 
 
 if __name__ == "__main__":
