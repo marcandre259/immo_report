@@ -1,0 +1,26 @@
+I'd like you to write a template for the following Dash App.
+
+The aim of the app is to let the user know how far an apartment he is
+looking to rent strays for the expected price per m2 in the area. To
+do this, the user filters per Belgian municipality and per range of
+living area.
+
+I'm taking care of computing expected price per m2 in the backend and
+other data is also work that is done in the back end. Hence, I'm just
+looking for a shell containing the relevant logic and the html
+front-end.
+
+Here is how the app should be structured:
+
+- On the left side, there is a menu with the living area and the
+  municipality as filter.
+
+- On top, an interactive figure is shown. It consists of a straight
+  horizontal line with the marked expected price per m2 given the set
+  filters. Points on the line are example offerings for that living
+  range in that municipality. Markers also indicate x% prediction
+  interval around the expected price per m2.
+
+- At the bottom, there is a chloropeth map divided into the regions of
+  the different Belgian municipalities. Color intensity vary according
+  to the expected price per m2 at the filtered set living area.
