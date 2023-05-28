@@ -40,6 +40,42 @@ lines(pl_df$log_area, y_hat_glm_poly, col="green")
 ## Now I'd like to allow for varying effect depending on the municipality
 ## (geographic unit)
 
+## glmer_area_poly <- glmer(price_m2 ~ poly(log_area, 4) + (1 +
+##                          poly(log_area, 4) | namedut), data=pl_df,
+##                          family=gaussian(link="log"))
+
+glmer_area_poly <- glmer(price_m2 ~ poly(log_area, 4) +
+                             (1 + log_area | namedut), data=pl_df,
+                         family=gaussian(link="log"))
+
+## Check goodness of fit vs fixed model
+anova(glmer_area_poly, glm_area_poly)
+
+## I don't think I really need a random effect, per city, I only
+## expect the baseline price_m2 to change
+glmer_int_poly <- glmer(price_m2 ~ poly(log_area, 4) +
+                             (1 | namedut), data=pl_df,
+                        family=gaussian(link="log"))
+
+anova(glmer_area_poly, glmer_int_poly)
+
+## Check R2 of the three contending models
+r2_check <- function(glmer_mod, outcome) {
+    y_hat <- predict(glmer_mod, type="response")
+    denom <- mean((outcome - y_hat)^2)
+    nom <- var(outcome)
+    return(1 - denom/nom)
+}
+
+## Big improvement in fit by accounting for municipality
+r2_check(glmer_int_poly, pl_df$price_m2)
+
+r2_check(glmer_area_poly, pl_df$price_m2)
+
+r2_check(glm_area_poly, pl_df$price_m2)
+
+
+
 
 
 
