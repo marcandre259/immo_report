@@ -5,8 +5,36 @@ from dash.dependencies import Input, Output, State
 import plotly.graph_objects as go
 import plotly.express as px
 
+import pandas as pd 
+import numpy as np
+
+import os
+from pathlib import Path
+
+current_file = Path(__file__).resolve()
+project_root = current_file.parents[2]
+
+import sys
+
+sys.path.append(str(project_root))
+
+## Declare app
 app = dash.Dash(__name__)
 
+## Prepare data 
+
+## Load predictions
+df_imp = pd.read_parquet(project_root / "data/pm2_df.parquet")
+
+## Load actual 
+df_actual = pd.read_parquet(project_root / "data/apart_df.parquet")
+
+municipality_names = list(np.sort(df_actual["namedut"].unique()))
+
+max_living_area = int(df_actual["living_area"].max() // 1000 * 2000)
+min_living_area = int(df_actual["living_area"].min() // 10 * 10)
+
+## layout
 app.layout = html.Div([
     html.Div([
         # Filters
@@ -14,20 +42,33 @@ app.layout = html.Div([
             html.H3("Filters"),
             dcc.Dropdown(
                 id='municipality-dropdown',
-                options=[],  # To be filled with the municipalities data
+                value="Leuven",
+                options=municipality_names,  # To be filled with the municipalities data
                 placeholder="Select a Municipality",
             ),
-            dcc.RangeSlider(
-                id='living-area-slider',
-                min=0, max=100,  # To be filled with the appropriate living area range
-                step=1,
-                value=[20, 80],
-                marks={
-                    0: '0',
-                    50: '50',
-                    100: '100'
-                }
-            )
+             html.Div([
+                html.Label('Living Area Range (m2):'),
+                html.Div([
+                    dcc.Input(
+                        id='min-living-area-input',
+                        type='number',
+                        value=min_living_area,
+                        min=min_living_area,
+                        max=max_living_area,
+                        step=5,
+                        placeholder="Min Living Area"
+                    ),
+                    dcc.Input(
+                        id='max-living-area-input',
+                        type='number',
+                        value=max_living_area,
+                        min=min_living_area,
+                        max=max_living_area,
+                        step=5,
+                        placeholder="Max Living Area"
+                    ),
+                ], style={'display': 'flex', 'justify-content': 'space-between'})
+            ]),
         ], className="menu"),
     ], style={'width': '20%', 'display': 'inline-block', 'vertical-align': 'top'}),
 
@@ -45,9 +86,10 @@ app.layout = html.Div([
     [Output('line-plot', 'figure'),
      Output('chloropleth-map', 'figure')],
     [Input('municipality-dropdown', 'value'),
-     Input('living-area-slider', 'value')]
+     Input('min-living-area-input', 'value'),
+     Input('max-living-area-input', 'value')]
 )
-def update_output(municipality, living_area):
+def update_output(municipality, min_living_area, max_living_area):
     # Here goes the logic of backend data processing 
     # for example, we're just making a mock figure
     line_fig = go.Figure()
