@@ -8,6 +8,7 @@ import plotly.express as px
 import warnings
 
 import pandas as pd
+import geopandas as gpd
 from pandas.errors import SettingWithCopyWarning
 import numpy as np
 
@@ -31,6 +32,9 @@ df_imp = pd.read_parquet(project_root / "data/pm2_df.parquet")
 
 ## Load actual
 df_actual = pd.read_parquet(project_root / "data/apart_df.parquet")
+
+gdf_municipalities = gpd.read_file(project_root / "data/municipalities_geo.gpkg")
+gdf_municipalities = gdf_municipalities[["tgid", "namedut", "geometry"]]
 
 municipality_names = list(np.sort(df_actual["namedut"].unique()))
 
@@ -238,7 +242,35 @@ def update_output(
             )
         )
 
-    # Mock chloropeth map, replace with actual data
+    # chloropeth map
+
+    # Filter actual and imp dataset on living area (to allow comparison)
+    bl = np.logical_and(
+        df_imp["living_area"] >= min_living_area,
+        df_imp["living_area"] <= max_living_area,
+    )
+    df_imp_filter = df_imp.loc[bl, :]
+    df_imp_group = df_imp_filter.groupby("namedut")["y_hat"].mean().reset_index()
+
+    bl = np.logical_and(
+        df_actual["living_area"] >= min_living_area,
+        df_actual["living_area"] <= max_living_area,
+    )
+
+    df_actual_filter = df_actual.loc[bl, :]
+
+    columns_to_aggregate = ["price", "living_area", "namedut"]
+    df_actual_filter = df_actual_filter[columns_to_aggregate]
+
+    df_actual_group = df_actual_filter.groupby("namedut").agg(
+        {"price": "mean", "living_area": "mean", "namedut": "count"}
+    )
+    df_actual_group = df_actual_group.rename({"namedut": "count"}, axis=1).reset_index()
+
+    df_group = pd.merge(df_imp_group, df_actual_group, on="namedut", how="inner")
+    df_group = gdf_municipalities.merge(df_group, on="namedut", how="inner")
+    gdf_group = gpd.GeoDataFrame(df_group)
+
     map_fig = go.Figure(
         data=go.Choropleth(
             locations=[],
