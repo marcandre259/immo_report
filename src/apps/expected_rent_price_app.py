@@ -7,6 +7,8 @@ import plotly.express as px
 
 import warnings
 
+import json
+
 import pandas as pd
 import geopandas as gpd
 from pandas.errors import SettingWithCopyWarning
@@ -33,8 +35,16 @@ df_imp = pd.read_parquet(project_root / "data/pm2_df.parquet")
 ## Load actual
 df_actual = pd.read_parquet(project_root / "data/apart_df.parquet")
 
-gdf_municipalities = gpd.read_file(project_root / "data/municipalities_geo.gpkg")
+gdf_municipalities = gpd.read_file(
+    project_root / "data/municipalities_geo.gpkg"
+).to_crs("EPSG:4326")
+gdf_municipalities["geometry"] = (
+    gdf_municipalities.to_crs(gdf_municipalities.estimate_utm_crs())
+    .simplify(100)
+    .to_crs(gdf_municipalities.crs)
+)
 gdf_municipalities = gdf_municipalities[["tgid", "namedut", "geometry"]]
+gdf_municipalities = gdf_municipalities.set_index("namedut")
 
 municipality_names = list(np.sort(df_actual["namedut"].unique()))
 
@@ -269,15 +279,19 @@ def update_output(
 
     df_group = pd.merge(df_imp_group, df_actual_group, on="namedut", how="inner")
     df_group = gdf_municipalities.merge(df_group, on="namedut", how="inner")
-    gdf_group = gpd.GeoDataFrame(df_group)
 
-    map_fig = go.Figure(
-        data=go.Choropleth(
-            locations=[],
-            z=[],
-            text=[],
-            geojson="http://geojson.io/",
-        )
+    # Relative price per m2 (for coloring)
+    ref_value = df_group.loc[df_group["namedut"] == municipality, "y_hat"].values[0]
+    df_group["relative_expectation"] = df_group["y_hat"] - ref_value
+
+    gdf_group = gpd.GeoDataFrame(df_group)
+    gdf_group = gdf_group.set_index(gdf_group["namedut"]).drop("namedut", axis=1)
+
+    map_fig = px.choropleth(
+        gdf_group,
+        geojson=gdf_group["geometry"],
+        locations=gdf_group.index,
+        color="relative_expectation",
     )
 
     return line_fig, map_fig
