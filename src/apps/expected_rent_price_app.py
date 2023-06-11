@@ -278,7 +278,7 @@ def update_output(
     df_actual_group = df_actual_group.rename({"namedut": "count"}, axis=1).reset_index()
 
     df_group = pd.merge(df_imp_group, df_actual_group, on="namedut", how="inner")
-    df_group = gdf_municipalities.merge(df_group, on="namedut", how="inner")
+    df_group = gdf_municipalities.merge(df_group, on="namedut", how="left")
 
     # Relative price per m2 (for coloring)
     ref_value = df_group.loc[df_group["namedut"] == municipality, "y_hat"].values[0]
@@ -292,7 +292,10 @@ def update_output(
         geojson=gdf_group["geometry"],
         locations=gdf_group.index,
         color="relative_expectation",
+        color_discrete_sequence=["rgba(0,0,0,0)"],
     )
+
+    map_fig.update_geos(fitbounds="locations", showland=True, showcountries=True)
 
     return line_fig, map_fig
 
