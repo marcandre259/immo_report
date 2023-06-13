@@ -29,7 +29,10 @@ from src.functions.flatten_dict import flatten_dict
 CLASSIFIED_PATH = ROOT_PATH / "data/classified"
 SCRAPING_DAY = 22
 
-logging.log(logging.INFO, "Start scraping classified data from {}".format(CLASSIFIED_PATH))
+logging.log(
+    logging.INFO, "Start scraping classified data from {}".format(CLASSIFIED_PATH)
+)
+
 
 # Extract date of classified
 def get_day(file_name: str):
@@ -38,6 +41,7 @@ def get_day(file_name: str):
         0
     ]  # First element of list, first group
     return datetime.strptime(year_string, "%Y%m%d").day
+
 
 # Keep classified files that were captured on the 15th of May
 list_filenames = os.listdir(CLASSIFIED_PATH)
